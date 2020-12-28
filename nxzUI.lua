@@ -3,7 +3,7 @@ local font = draw.CreateFont('Verdana', 12);
     local SCRIPT_FILE_NAME = GetScriptName()
     local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
     local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-    local VERSION_NUMBER = "1.0"
+    local VERSION_NUMBER = "1.1"
     local version_check_done = false
     local update_downloaded = false
     local update_available = false
@@ -382,22 +382,45 @@ callbacks.Register("Draw", function()
  
     drawkeybinds(Keybinds);
     dragFeature();
+
+end)
+
+local leftHandKnife = gui.Checkbox(mainGroup,"lfknife","Left Hand Knife", 0);
+
+callbacks.Register('Draw', function()
+    
+    if not leftHandKnife:GetValue() then
+		return
+	end
+
+	local LocalPlayer = entities.GetLocalPlayer()
+
+	local WeaponID = LocalPlayer:GetWeaponID()
+	local WeaponType = LocalPlayer:GetWeaponType()
+
+	if WeaponType == 0 and WeaponID ~= 31 then
+		client.Command('cl_righthand 0', true)
+	else
+		client.Command('cl_righthand 1', true)
+	end
 end)
 ------------------------------------------------------------
 --DrawUI
 ------------------------------------------------------------
  
 function DrawUI()
-    Window = gui.Window("mainWindow", "nxzUI", 150, 150, 328, 340)
+    Window = gui.Window("mainWindow", "nxzUI", 150, 150, 328, 400)
     Window:SetOpenKey(45)
 
     mainGroup = gui.Groupbox(Window, "Main Settings", 16,16,296,100)
-    colorGroup = gui.Groupbox(Window, "Colours", 16,185,296,100)
+    colorGroup = gui.Groupbox(Window, "Colours", 16,235,296,100)
 
     keybindlist = gui.Checkbox(mainGroup,"keybindlist","Show Keybinds",0);
     keybindlist:SetDescription("Shows a list of active keybinds.");
     watermark = gui.Checkbox(mainGroup,"watermark","Show Watermark",0);
     watermark:SetDescription("Shows watermark.");
+    leftHandKnife = gui.Checkbox(mainGroup,"lfknife","Left Hand Knife", 0);
+    leftHandKnife:SetDescription("Forces left hand when holding knife.");
     colorPicker = gui.ColorPicker(colorGroup, "mainCol", "Main Colour", 239, 150, 255,255)
     colorPicker2 = gui.ColorPicker(colorGroup, "textCol", "Text Colour", 255,255,255,255)
     --customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Name", 0)
