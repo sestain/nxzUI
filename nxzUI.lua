@@ -43,10 +43,10 @@ local font = draw.CreateFont('Verdana', 12);
             draw.Color(239, 150, 255,255 - fadeout)
             draw.Text(7 - 650 + fadein, 7, "nxz")
             draw.Color(225,225,225,255 - fadeout)
-            draw.Text(7 + draw.GetTextSize("nxz ") - 650 + fadein, 7, "UI")
+            draw.Text(7 + draw.GetTextSize("nxz ") - 650 + fadein, 7, "UI BETA ")
             draw.Color(239, 150, 255,255 - fadeout)
-            draw.Text(7 + draw.GetTextSize("nxzUI  ") - 650 + fadein, 7, "\\\\")
-            spacing = draw.GetTextSize("nxzUI BETA \\  ")
+            draw.Text(7 + draw.GetTextSize("nxzUI BETA  ") - 650 + fadein, 7, "\\\\")
+            spacing = draw.GetTextSize("nxzUI BETA \\    ")
             draw.SetFont(updaterfont2)
             draw.Color(225,225,225,255 - fadeout)
         end
