@@ -1,7 +1,5 @@
 local font = draw.CreateFont('Verdana', 12);
  
-function update()
-
     local SCRIPT_FILE_NAME = GetScriptName()
     local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
     local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
@@ -83,10 +81,6 @@ function update()
             draw.Text(7 + spacing - 650 + fadein, 9, "Successfully loaded latest version: v" .. VERSION_NUMBER)
         end
     end)
-
-end
-
-update();
 
 callbacks.Register("Draw", function()
     if (watermark:GetValue() ~= true) then
