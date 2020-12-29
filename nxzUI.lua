@@ -3,7 +3,7 @@ local font = draw.CreateFont('Verdana', 12);
     local SCRIPT_FILE_NAME = GetScriptName()
     local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
     local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-    local VERSION_NUMBER = "1.1.1"
+    local VERSION_NUMBER = "1.2"
     local version_check_done = false
     local update_downloaded = false
     local update_available = false
@@ -102,11 +102,11 @@ callbacks.Register("Draw", function()
     local cheatName = 'aimware';
 
     --function customName()
-    --[[if customNameCheckBox:GetValue() == true then
+    if customNameCheckBox:GetValue() == true then
         cheatName = gui.GetValue("mainWindow.textBox")
     else
         cheatName = 'aimware';
-    end]]--
+    end
 
     local indexlp = client.GetLocalPlayerIndex()
     local userName = client.GetConVar( "name" )
@@ -158,7 +158,9 @@ end)
 
 
 local mouseX, mouseY, x, y, dx, dy, w, h = 0, 0, 25, 660, 0, 0, 300, 60;
+local mouseX2, mouseY2, x2, y2, dx2, dy2, w2, h2 = 0, 0, 25, 660, 0, 0, 300, 60;
 local shouldDrag = false;
+local shouldDrag2 = false;
 local font = draw.CreateFont("Verdana", 12, 12);
 local topbarSize = 20;
 local svgData = http.Get( "http://eaassets-a.akamaihd.net/battlelog/prod/emblem/325/83/320/2955057809976353965.png" );
@@ -280,6 +282,36 @@ end
  
     return Keybinds;
 end
+
+function round(num, numDecimalPlaces)
+    local mult = 10^(numDecimalPlaces or 0)
+    return math.floor(num * mult + 0.5) / mult
+  end
+
+local function getInfo()
+    local Infos = {};
+    local i = 1;
+
+    local localName = entities.GetLocalPlayer():GetName()
+    Infos[i] = "Name: " .. localName;
+        i = i + 1;
+    local health = entities.GetLocalPlayer():GetHealth()
+    local maxHealth = entities.GetLocalPlayer():GetMaxHealth()
+    Infos[i] = "Health: " .. health .. " / " .. maxHealth;
+        i = i + 1;
+    local whatTeam = entities.GetLocalPlayer():GetTeamNumber()
+    if whatTeam == 3 then
+    Infos[i] = "Team: CT"
+        i = i + 1;
+    elseif whatTeam == 2 then
+        Infos[i] = "Team: T"
+        i = i + 1;
+    end
+    local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
+    Infos[i] = "Inaccuracy: " .. round(weaponInacc, 2) * 175 .. "%";
+        i = i + 1;
+        return Infos;
+end
  
 local function drawkeybinds(Keybinds)
     local temp = false;
@@ -301,6 +333,26 @@ local function drawkeybinds(Keybinds)
     end
 end
  
+local function drawInfo(Infos)
+    local temp = false;
+    for index in pairs(Infos) do
+        
+        if (temp) then
+            render.gradient( x2 + 9, (y2 + topbarSize + 5) + (index * 15), 198, 1, { 13, 14, 15, 255 }, {40, 30, 30, 255 }, false );
+        end
+        temp=true;
+        draw.SetFont(font);
+        draw.Color(0, 0, 0, 200);
+        draw.Text(x2 + 10, (y2 + topbarSize + 5) + (index * 15), Infos[index])
+        --draw.Text(x + 85, (y + topbarSize + 5) + (index * 15), "[active]")
+ 
+        draw.SetFont(font);
+        draw.Color(255, 255, 255, 255);
+        --draw.Text(x + 84, (y + topbarSize + 4) + (index * 15), "[active]")
+        draw.Text(x2 + 9, (y2 + topbarSize + 4) + (index * 15), Infos[index])
+    end
+end
+
 local function drawRectFill(r, g, b, a, x, y, w, h, texture)
     if (texture ~= nil) then
         draw.SetTexture(texture);
@@ -339,6 +391,23 @@ local function dragFeature()
     end
 end
  
+local function dragFeature2()
+    if input.IsButtonDown(1) then
+        mouseX2, mouseY2 = input.GetMousePos();
+        if shouldDrag2 then
+            x2 = mouseX2 - dx2;
+            y2 = mouseY2 - dy2;
+        end
+        if mouseX2 >= x2 and mouseX2 <= x2 + w2 and mouseY2 >= y and mouseY2 <= y2 + 40 then
+            shouldDrag2 = true;
+            dx2 = mouseX2 - x2;
+            dy2 = mouseY2 - y2;
+        end
+    else
+        shouldDrag2 = false;
+    end
+end
+
 local function drawOutline(r, g, b, a, x, y, w, h, howMany)
     for i = 1, howMany do
         draw.Color(r, g, b, a);
@@ -371,6 +440,32 @@ local function drawWindow(Keybinds)
  
     
 end
+
+local function drawWindow2(localInfo)
+    local tW, _ = draw.GetTextSize(keytext);
+    --local h2 = 5 + (Infos * 15);
+    --local h = h + (Infos * 15);
+    
+    drawRectFillCol(28, 76, 192, 200, x2 + 7, y2 + 21, 121, 1);
+    drawRectFillCol(78, 126, 242, 190, x2 + 7, y2 + 20, 121, 1);
+    drawRectFill(0, 0, 0, 150, x2 + 7, y2 + 22, 121, 14);
+ 
+    draw.Color(0,0,0,255);
+    draw.SetFont(font);
+    local keytext = 'Information';
+    
+    draw.Text(x2 + ((85 - tW) / 2), y2 + 25, keytext)
+ 
+    draw.Color(gui.GetValue("mainWindow.textCol"));
+    draw.SetFont(font);
+    
+    draw.Text(x2 + ((84 - tW) / 2), y2 + 24, keytext)
+    
+    draw.Color(255, 255, 255);
+    draw.SetTexture( texture );
+ 
+    
+end
  
 callbacks.Register("Draw", function()
     if keybindlist:GetValue() == false then return end
@@ -382,6 +477,19 @@ callbacks.Register("Draw", function()
  
     drawkeybinds(Keybinds);
     dragFeature();
+
+end)
+
+callbacks.Register("Draw", function()
+    if pLocalInfo:GetValue() == false then return end
+    if not entities.GetLocalPlayer() or not entities.GetLocalPlayer():IsAlive() then return end
+ 
+    draw.SetTexture( texture );
+    local Infos = getInfo();
+    drawWindow2(#Infos);
+ 
+    drawInfo(Infos);
+    dragFeature2();
 
 end)
 
@@ -407,32 +515,33 @@ end)
 ------------------------------------------------------------
  
 function DrawUI()
-    Window = gui.Window("mainWindow", "nxzUI", 150, 150, 328, 400)
+    Window = gui.Window("mainWindow", "nxzUI", 150, 150, 328, 540)
     Window:SetOpenKey(45)
 
     mainGroup = gui.Groupbox(Window, "Main Settings", 16,16,296,100)
-    colorGroup = gui.Groupbox(Window, "Colours", 16,235,296,100)
+    colorGroup = gui.Groupbox(Window, "Colours", 16,380,296,100)
 
-    keybindlist = gui.Checkbox(mainGroup,"keybindlist","Show Keybinds",0);
-    keybindlist:SetDescription("Shows a list of active keybinds.");
     watermark = gui.Checkbox(mainGroup,"watermark","Show Watermark",0);
     watermark:SetDescription("Shows watermark.");
+    keybindlist = gui.Checkbox(mainGroup,"keybindlist","Show Keybinds",0);
+    keybindlist:SetDescription("Shows a list of active keybinds.");
+    pLocalInfo = gui.Checkbox(mainGroup, "playerInfo", "Local Player Info", 0);
+    pLocalInfo:SetDescription("Shows the local players information");
     leftHandKnife = gui.Checkbox(mainGroup,"lfknife","Left Hand Knife", 0);
     leftHandKnife:SetDescription("Forces left hand when holding knife.");
     colorPicker = gui.ColorPicker(colorGroup, "mainCol", "Main Colour", 239, 150, 255,255)
     colorPicker2 = gui.ColorPicker(colorGroup, "textCol", "Text Colour", 255,255,255,255)
-    --customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Name", 0)
-    --editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark name")
+    customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Name", 0)
+    editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark name")
 
     end
 
---function customName()
-    --if customNameCheckBox:GetValue() == true then
-        --cheatName = gui.GetValue("mainWindow.textBox")
-        --cheatName = "nxzUI";
-    --else
+function customName()
+    if customNameCheckBox:GetValue() == true then
+        cheatName = gui.GetValue("mainWindow.textBox")
+    else
         cheatName = 'aimware';
-    --end
---end
+    end
+end
 
 DrawUI();
