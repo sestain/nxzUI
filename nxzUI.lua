@@ -3,7 +3,7 @@ local font = draw.CreateFont('Verdana', 12);
     local SCRIPT_FILE_NAME = GetScriptName()
     local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
     local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-    local VERSION_NUMBER = "1.2"
+    local VERSION_NUMBER = "1.3"
     local version_check_done = false
     local update_downloaded = false
     local update_available = false
@@ -208,8 +208,12 @@ if gui.GetValue("lbot.master") and input.IsButtonDown(gui.GetValue("lbot.trg.key
     Keybinds[i] = 'Triggerbot';
         i = i + 1;
     end
-if gui.GetValue("lbot.master") and gui.GetValue("lbot.antiaim.type") ~= '"Off"' then
-    Keybinds[i] = 'Legit AA';
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.antiaim.type") == '"Minimum"' then
+    Keybinds[i] = 'Min Legit AA';
+        i = i + 1;
+    end
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.antiaim.type") == '"Maximum"' then
+    Keybinds[i] = 'Max Legit AA';
         i = i + 1;
     end
 if gui.GetValue("lbot.master") and gui.GetValue("lbot.extra.knifetrigger") then
@@ -219,6 +223,22 @@ if gui.GetValue("lbot.master") and gui.GetValue("lbot.extra.knifetrigger") then
 if gui.GetValue("lbot.master") and gui.GetValue("misc.fakelag.enable") then
     Keybinds[i] = 'Fakelag';
         i = i + 1;
+    end
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.movement.quickstop") then
+    Keybinds[i] = 'Quick Stop';
+        i = i + 1;
+    end
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.posadj.backtrack") then
+    Keybinds[i] = 'Backtrack';
+        i = i + 1;
+    end
+    if gui.GetValue("lbot.master") and gui.GetValue("lbot.posadj.resolver") then
+        Keybinds[i] = 'Resolver';
+            i = i + 1;
+    end
+    if gui.GetValue("lbot.master") and gui.GetValue("lbot.semirage.silentaimbot") then
+        Keybinds[i] = 'Silent Aim';
+            i = i + 1;
     end
 ---------------------------
 if gui.GetValue("rbot.master") and (wid == 1 or wid == 64) and gui.GetValue("rbot.accuracy.weapon.hpistol.doublefire") then
