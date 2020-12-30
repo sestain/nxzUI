@@ -110,7 +110,6 @@ local watermark = gui.Checkbox(mainGroup, "watermark", "Watermark", false)
 local keybindlist = gui.Checkbox(mainGroup, "keybindlist", "Show Keybinds", false)
 local infolist = gui.Checkbox(mainGroup, "infolist", "pLocal Info", false)
 local leftHandKnife = gui.Checkbox(mainGroup, "lefthandknife", "Left Hand Knife", false)
-local menuResize = gui.Checkbox(mainGroup, "menuresize", "Resizable Menu", false)
 local customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Name", false)
 local editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark name")
 
