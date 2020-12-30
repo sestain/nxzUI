@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "2.1"
+local VERSION_NUMBER = "2.2"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -253,7 +253,7 @@ local function getKeybinds()
     hLocalPlayer = entities.GetLocalPlayer();
     wid = hLocalPlayer:GetWeaponID()
 ---------------------------
-if gui.GetValue("lbot.master") and input.IsButtonDown(gui.GetValue("lbot.trg.key")) then
+if gui.GetValue("lbot.master") and gui.GetValue("lbot.trg.key") ~= 0 and input.IsButtonDown(gui.GetValue("lbot.trg.key")) then
     Keybinds[i] = 'Triggerbot';
         i = i + 1;
     end
@@ -512,13 +512,13 @@ end)
 --[[KEYBINDS END]]--
 
 --[[pLOCAL INFO START]]--
-local localName = entities.GetLocalPlayer():GetName()
-local health = entities.GetLocalPlayer():GetHealth()
-local maxHealth = entities.GetLocalPlayer():GetMaxHealth()
-local whatTeam = entities.GetLocalPlayer():GetTeamNumber()
-local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
-
 callbacks.Register("Draw", function()
+    local localName = entities.GetLocalPlayer():GetName()
+    local health = entities.GetLocalPlayer():GetHealth()
+    local maxHealth = entities.GetLocalPlayer():GetMaxHealth()
+    local whatTeam = entities.GetLocalPlayer():GetTeamNumber()
+    local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
+
 draw.Color(gui.GetValue("nxzUIWindow.textCol"));
 draw.SetFont(font2);
 
