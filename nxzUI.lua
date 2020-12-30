@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "2.1"
+local VERSION_NUMBER = "2.0"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
