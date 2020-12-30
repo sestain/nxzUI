@@ -155,13 +155,13 @@ callbacks.Register("Draw", function()
     end
  
     local divider = ' | ';
-    local cheatName = 'aimware';
+    local cheatName = 'nxzUI';
 
     --function customName()
     if customNameCheckBox:GetValue() == true then
         cheatName = gui.GetValue("nxzUIWindow.textBox")
     else
-        cheatName = 'aimware';
+        cheatName = 'nxzUI';
     end
 
     local indexlp = client.GetLocalPlayerIndex()
