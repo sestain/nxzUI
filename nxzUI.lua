@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "2.2"
+local VERSION_NUMBER = "2.3"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -100,18 +100,20 @@ local font = draw.CreateFont('Verdana', 12)
 local font2 = draw.CreateFont('Verdana', 16)
 local settingsRef = gui.Reference("SETTINGS")
 local infoTab = gui.Tab(settingsRef, "info.tab", "nxzUI v" .. VERSION_NUMBER)
-local Window = gui.Window( "nxzUIWindow", "nxzUI v" .. VERSION_NUMBER, 150, 150, 328, 475)
+local Window = gui.Window( "nxzUIWindow", "nxzUI v" .. VERSION_NUMBER, 150, 150, 328, 570)
 
 local infoMainGroup = gui.Groupbox(infoTab, "Credits", 16,16,610,100)
 local mainGroup = gui.Groupbox(Window, "Main Settings", 16,16,296,100)
-local colorGroup = gui.Groupbox(Window, "Colours", 16,310,296,100)
+local colorGroup = gui.Groupbox(Window, "Colours", 16,410,296,100)
 
 local watermark = gui.Checkbox(mainGroup, "watermark", "Watermark", false)
 local keybindlist = gui.Checkbox(mainGroup, "keybindlist", "Show Keybinds", false)
 local infolist = gui.Checkbox(mainGroup, "infolist", "pLocal Info", false)
 local leftHandKnife = gui.Checkbox(mainGroup, "lefthandknife", "Left Hand Knife", false)
-local customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Name", false)
-local editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark name")
+local customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Cheat Name", false)
+local customNameCheckBox2 = gui.Checkbox(mainGroup, "cNCheckBox2", "Custom Watermark Username", false)
+local editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark cheat name")
+local editbox2 = gui.Editbox(mainGroup, "textBox2", "Custom watermark username")
 
 local colorPickerBar = gui.ColorPicker(colorGroup, "mainCol", "Main Colour", 239, 150, 255,255)
 local colorPickerText = gui.ColorPicker(colorGroup, "textCol", "Text Colour", 255,255,255,255)
@@ -130,7 +132,7 @@ end
 
 gui.Text(infoMainGroup, "nxzUI v2")
 gui.Text(infoMainGroup, "-------------------------------------------------------------------------------------------------------------------")
-gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838)")
+gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Bugs Fixed by Sestain#5799 (UID:219942)")
 gui.Text(infoMainGroup, "nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.")
 gui.Text(infoMainGroup, "I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long     period of time.")
 gui.Text(infoMainGroup, "aimware still hasn't updated the docs which makes it kinda hard to make new features/ideas.")
@@ -166,6 +168,14 @@ callbacks.Register("Draw", function()
 
     local indexlp = client.GetLocalPlayerIndex()
     local userName = client.GetConVar( "name" )
+
+    if customNameCheckBox2:GetValue() == true then
+        userName = gui.GetValue("nxzUIWindow.textBox2")
+    else
+        userName = client.GetConVar( "name" )
+    end
+
+    
     
     -- Do not edit below
     local delay;
@@ -513,6 +523,8 @@ end)
 
 --[[pLOCAL INFO START]]--
 callbacks.Register("Draw", function()
+
+    if not entities.GetLocalPlayer() then return end
     local localName = entities.GetLocalPlayer():GetName()
     local health = entities.GetLocalPlayer():GetHealth()
     local maxHealth = entities.GetLocalPlayer():GetMaxHealth()
@@ -559,8 +571,10 @@ end)
 
 --[[LEFT HAND KNIFE START]]--
 callbacks.Register('Draw', function()
+    if not entities.GetLocalPlayer() then return end
     
     if not leftHandKnife:GetValue() then
+        client.Command('cl_righthand 1', true)
 		return
 	end
 
