@@ -132,7 +132,7 @@ end
 
 gui.Text(infoMainGroup, "nxzUI v2")
 gui.Text(infoMainGroup, "-------------------------------------------------------------------------------------------------------------------")
-gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838)")
+gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Bugs Fixed by Sestain#5799 (UID:219942)")
 gui.Text(infoMainGroup, "nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.")
 gui.Text(infoMainGroup, "I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long     period of time.")
 gui.Text(infoMainGroup, "aimware still hasn't updated the docs which makes it kinda hard to make new features/ideas.")
@@ -523,6 +523,8 @@ end)
 
 --[[pLOCAL INFO START]]--
 callbacks.Register("Draw", function()
+
+    if not entities.GetLocalPlayer() then return end
     local localName = entities.GetLocalPlayer():GetName()
     local health = entities.GetLocalPlayer():GetHealth()
     local maxHealth = entities.GetLocalPlayer():GetMaxHealth()
@@ -569,6 +571,7 @@ end)
 
 --[[LEFT HAND KNIFE START]]--
 callbacks.Register('Draw', function()
+    if not entities.GetLocalPlayer() then return end
     
     if not leftHandKnife:GetValue() then
         client.Command('cl_righthand 1', true)
