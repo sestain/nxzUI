@@ -132,7 +132,7 @@ function round(num, numDecimalPlaces)
     return math.floor(num * mult + 0.5) / mult
 end
 
-gui.Text(infoMainGroup, "nxzUI v2")
+gui.Text(infoMainGroup, "nxzUI v3")
 gui.Text(infoMainGroup, "-------------------------------------------------------------------------------------------------------------------")
 gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Bugs Fixed by Sestain#5799 (UID:219942)")
 gui.Text(infoMainGroup, "nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.")
