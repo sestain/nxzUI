@@ -1,6 +1,6 @@
 --[[
 
-nxzUI v2 by naz.
+nxzUI v3 by naz.
 
 nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.
 I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long period of time.
@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "2.3"
+local VERSION_NUMBER = "3.1"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -99,38 +99,42 @@ end)
 local font = draw.CreateFont('Verdana', 12)
 local font2 = draw.CreateFont('Verdana', 16)
 local settingsRef = gui.Reference("SETTINGS")
-local infoTab = gui.Tab(settingsRef, "info.tab", "nxzUI v" .. VERSION_NUMBER)
-local Window = gui.Window( "nxzUIWindow", "nxzUI v" .. VERSION_NUMBER, 150, 150, 328, 570)
+local visualsRef = gui.Reference("VISUALS")
+local miscRef = gui.Reference("MISC")
+local visualTab = gui.Tab(visualsRef, "visualTab", "nxzUI Visuals")
+local miscTab = gui.Tab(miscRef, "miscTab", "nxzUI Misc")
+local infoTab = gui.Tab(settingsRef, "infoTab", "nxzUI v" .. VERSION_NUMBER)
 
 local infoMainGroup = gui.Groupbox(infoTab, "Credits", 16,16,610,100)
-local mainGroup = gui.Groupbox(Window, "Main Settings", 16,16,296,100)
-local colorGroup = gui.Groupbox(Window, "Colours", 16,410,296,100)
+local mainGroup = gui.Groupbox(visualTab, "Main Settings", 16,16,296,100)
+local miscGroup = gui.Groupbox(miscTab, "Main Settings", 16,16,296,100)
+local colorGroup = gui.Groupbox(visualTab, "Colours", 328,16,296,100)
 
 local watermark = gui.Checkbox(mainGroup, "watermark", "Watermark", false)
 local keybindlist = gui.Checkbox(mainGroup, "keybindlist", "Show Keybinds", false)
 local infolist = gui.Checkbox(mainGroup, "infolist", "pLocal Info", false)
 local leftHandKnife = gui.Checkbox(mainGroup, "lefthandknife", "Left Hand Knife", false)
+local sniperXHair = gui.Checkbox(mainGroup, "sniperxhair", "Sniper Crosshair", false)
+local rainbowBar = gui.Checkbox(mainGroup, "rainbowBar", "Rainbow Bar", false)
+local ezfrags = gui.Checkbox(miscGroup, "ezfragsKS", "EZ Frags Kill Say", false)
+local customKillSay = gui.Checkbox(miscGroup, "customKS", "Custom Killsay", false)
 local customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Cheat Name", false)
 local customNameCheckBox2 = gui.Checkbox(mainGroup, "cNCheckBox2", "Custom Watermark Username", false)
 local editbox = gui.Editbox(mainGroup, "textBox", "Custom watermark cheat name")
 local editbox2 = gui.Editbox(mainGroup, "textBox2", "Custom watermark username")
+local customKSEditBox = gui.Editbox(miscGroup, "KSEditBox", "Custom Killsay")
 
 local colorPickerBar = gui.ColorPicker(colorGroup, "mainCol", "Main Colour", 239, 150, 255,255)
 local colorPickerText = gui.ColorPicker(colorGroup, "textCol", "Text Colour", 255,255,255,255)
-Window:SetOpenKey( 45 )
-
-if gui.Reference("Menu"):IsActive() then
-    Window:SetActive(true);
-else
-    Window:SetActive(false);
-end
 
 function round(num, numDecimalPlaces)
     local mult = 10^(numDecimalPlaces or 0)
+    if not entities.GetLocalPlayer() then return end
+	if not entities.GetLocalPlayer():IsAlive() then return end
     return math.floor(num * mult + 0.5) / mult
 end
 
-gui.Text(infoMainGroup, "nxzUI v2")
+gui.Text(infoMainGroup, "nxzUI v3")
 gui.Text(infoMainGroup, "-------------------------------------------------------------------------------------------------------------------")
 gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Bugs Fixed by Sestain#5799 (UID:219942)")
 gui.Text(infoMainGroup, "nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.")
@@ -148,20 +152,15 @@ callbacks.Register("Draw", function()
     local playerResources = entities.GetPlayerResources();
  
     -- do not edit above
-
-    -- Check if main GUI is open. This is to stop GUI lockups if you set this lua to auto run.
-    if gui.Reference("Menu"):IsActive() then
-        Window:SetActive(true);
-    else
-        Window:SetActive(false);
-    end
  
     local divider = ' | ';
+    local divider2 = '| ';
+    local space = ' ';
     local cheatName = 'nxzUI';
 
     --function customName()
     if customNameCheckBox:GetValue() == true then
-        cheatName = gui.GetValue("nxzUIWindow.textBox")
+        cheatName = gui.GetValue("esp.visualTab.textBox")
     else
         cheatName = 'nxzUI';
     end
@@ -170,7 +169,7 @@ callbacks.Register("Draw", function()
     local userName = client.GetConVar( "name" )
 
     if customNameCheckBox2:GetValue() == true then
-        userName = gui.GetValue("nxzUIWindow.textBox2")
+        userName = gui.GetValue("esp.visualTab.textBox2")
     else
         userName = client.GetConVar( "name" )
     end
@@ -179,18 +178,23 @@ callbacks.Register("Draw", function()
     
     -- Do not edit below
     local delay;
+    local string;
     local tick;
   
     if (lp ~= nil) then
-        delay = 'delay: ' .. playerResources:GetPropInt("m_iPing", lp:GetIndex()) .. 'ms';
-        tick = math.floor(lp:GetProp("localdata", "m_nTickBase") + 0x20 * 2) .. 'tick';
+        delay = 'delay: ' .. playerResources:GetPropInt("m_iPing", lp:GetIndex()) .. 'ms ';
+        string = engine.GetServerIP() == "loopback" and "local server" or (engine.GetServerIP():find("^=%[A") and "valve server" or (engine.GetServerIP() == "(unknown)" and "Demo" or engine.GetServerIP()));
+        --tick = math.floor(lp:GetProp("localdata", "m_nTickBase") + 0x3430 * 2) .. 'tick';
     end
-    local watermarkText = cheatName .. divider .. userName .. divider;
+    local watermarkText = cheatName .. divider .. userName .. space;
+    if (string ~= nil) then
+        watermarkText = watermarkText .. divider2 .. string;
+    end
     if (delay ~= nil) then
-        watermarkText = watermarkText .. delay .. divider;
+        watermarkText = watermarkText .. divider .. delay ;
     end
     if (tick ~= nil) then
-        watermarkText = watermarkText .. tick;
+        --watermarkText = watermarkText .. tick;
     end 
     draw.SetFont(font);
     local w, h = draw.GetTextSize(watermarkText);
@@ -204,13 +208,13 @@ callbacks.Register("Draw", function()
     draw.Color(0, 0, 0, 255)
     draw.Text(start_x + weightPadding / 2+5, start_y + heightPadding / 2 - 2, watermarkText );
  
-    draw.Color(gui.GetValue("nxzUIWindow.textCol"));
+    draw.Color(gui.GetValue("esp.visualTab.textCol"));
     draw.Text(start_x + weightPadding / 2+6, start_y + heightPadding / 2 - 3, watermarkText );
  
  
-    draw.Color(gui.GetValue("nxzUIWindow.mainCol"));
+    draw.Color(gui.GetValue("esp.visualTab.mainCol"));
     draw.FilledRect(start_x+10, start_y, start_x + watermarkWidth , start_y +1);
-    draw.Color(gui.GetValue("nxzUIWindow.mainCol"));
+    draw.Color(gui.GetValue("esp.visualTab.mainCol"));
     draw.FilledRect(start_x+10, start_y, start_x + watermarkWidth , start_y +2);
 end)
 --[[WATERMARK END]]--
@@ -228,7 +232,7 @@ local texture = draw.CreateTexture( imgRGBA, imgWidth, imgHeight );
 local render = {};
  
 render.outline = function( x, y, w, h, col )
-    draw.Color(gui.GetValue("nxzUIWindow.colorPicker"));
+    draw.Color(gui.GetValue("esp.visualTab.colorPicker"));
     draw.OutlinedRect( x, y, x + w, y + h );
 end
 render.rect = function( x, y, w, h, col )
@@ -300,7 +304,7 @@ if gui.GetValue("lbot.master") and gui.GetValue("lbot.posadj.backtrack") then
             i = i + 1;
     end
 ---------------------------
-if gui.GetValue("rbot.master") and (wid == 1 or wid == 64) and gui.GetValue("rbot.accuracy.weapon.hpistol.doublefire") then
+if gui.GetValue("rbot.master") and (wid == 1 or wid == 64) and gui.GetValue("rbot.accuracy.weapon.hpistol.doublefire") ~= 0 then
     Keybinds[i] = 'Doubletap';
         i = i + 1;
 elseif gui.GetValue("rbot.master") and (wid == 2 or wid == 3 or wid == 4 or wid == 30 or wid == 32 or wid == 36 or wid == 61 or wid == 63) and gui.GetValue("rbot.accuracy.weapon.pistol.doublefire") ~= 0 then
@@ -435,7 +439,7 @@ local function drawRectFillCol(r, g, b, a, x, y, w, h, texture)
     else
         draw.SetTexture(texture);
     end
-    draw.Color(gui.GetValue("nxzUIWindow.mainCol"));
+    draw.Color(gui.GetValue("esp.visualTab.mainCol"));
     draw.FilledRect(x, y, x + w, y + h);
 end
  
@@ -496,7 +500,7 @@ local function drawWindow(Keybinds)
     
     draw.Text(x + ((85 - tW) / 2), y + 25, keytext)
  
-    draw.Color(gui.GetValue("nxzUIWindow.textCol"));
+    draw.Color(gui.GetValue("esp.visualTab.textCol"));
     draw.SetFont(font);
     
     draw.Text(x + ((84 - tW) / 2), y + 24, keytext)
@@ -531,7 +535,7 @@ callbacks.Register("Draw", function()
     local whatTeam = entities.GetLocalPlayer():GetTeamNumber()
     local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
 
-draw.Color(gui.GetValue("nxzUIWindow.textCol"));
+draw.Color(gui.GetValue("esp.visualTab.textCol"));
 draw.SetFont(font2);
 
 if whatTeam == 3 then
@@ -543,6 +547,9 @@ end
 if infolist:GetValue() == true then
 
     local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
+        if not entities.GetLocalPlayer() then return end
+        if not entities.GetLocalPlayer():IsAlive() then return end
+        
         inaccuracy = round(weaponInacc, 3) * 100;
         inaccuracy2 = 100 - inaccuracy;
 
@@ -660,3 +667,108 @@ end
 
 callbacks.Register("Draw", gay)
 --[[MENU RESIZE END]]--
+
+--[[RAINBOW BAR START]]--
+
+callbacks.Register('Draw', function()
+    if rainbowBar:GetValue() == true then
+        local screenSize = draw.GetScreenSize();
+        local r = math.floor(math.sin(globals.RealTime() * 1) * 127 + 128);
+        local g = math.floor(math.sin(globals.RealTime() * 1 + 2) * 127 + 128);
+        local b = math.floor(math.sin(globals.RealTime() * 1 + 4) * 127 + 128);
+    
+        draw.Color(r, g, b, 255);
+        draw.FilledRect(0, 0, screenSize, 2.5);
+    end
+end)
+--[[RAINBOW BAR END]]--
+
+--[[EZ FRAGS KILLSAY START]]--
+local killsays = {
+    [1] = "Visit www.EZfrags.co.uk for the finest public & private CS:GO cheats",
+   [2] = "Stop being a noob! Get good with www.EZfrags.co.uk",
+   [3] = "I'm not using www.EZfrags.co.uk, you're just bad",
+   [4] = "You just got owned by EZfrags, the #1 CS:GO cheat",
+   [5] = "If I was cheating, I'd use www.EZfrags.co.uk",
+   [6] = "Think you could do better? Not without www.EZfrags.co.uk",
+}
+
+function CHAT_KillSay( Event )
+   if ezfrags:GetValue() == true then
+   if ( Event:GetName() == 'player_death' ) then
+       
+       local ME = client.GetLocalPlayerIndex();
+       
+       local INT_UID = Event:GetInt( 'userid' );
+       local INT_ATTACKER = Event:GetInt( 'attacker' );
+       
+       local NAME_Victim = client.GetPlayerNameByUserID( INT_UID );
+       local INDEX_Victim = client.GetPlayerIndexByUserID( INT_UID );
+       
+       local NAME_Attacker = client.GetPlayerNameByUserID( INT_ATTACKER );
+       local INDEX_Attacker = client.GetPlayerIndexByUserID( INT_ATTACKER );
+       
+       if ( INDEX_Attacker == ME and INDEX_Victim ~= ME ) then
+       
+               local response = tostring(killsays[math.random(#killsays)]);
+               response = response:gsub("name", NAME_Victim);
+               client.ChatSay( ' ' .. response );
+       else
+        return;
+       end
+       
+       end
+   
+   end
+end
+
+client.AllowListener( 'player_death' );
+
+callbacks.Register('FireGameEvent', 'AWKS', CHAT_KillSay);
+--[[EZ FRAGS KILLSAY END]]--
+
+--[[CUSTOM KILLSAY START]]--
+function CHAT_customKillSay( Event )
+    if customKillSay:GetValue() == true then
+    if ( Event:GetName() == 'player_death' ) then
+        
+        local ME = client.GetLocalPlayerIndex();
+        
+        local INT_UID = Event:GetInt( 'userid' );
+        local INT_ATTACKER = Event:GetInt( 'attacker' );
+        
+        local NAME_Victim = client.GetPlayerNameByUserID( INT_UID );
+        local INDEX_Victim = client.GetPlayerIndexByUserID( INT_UID );
+        
+        local NAME_Attacker = client.GetPlayerNameByUserID( INT_ATTACKER );
+        local INDEX_Attacker = client.GetPlayerIndexByUserID( INT_ATTACKER );
+        
+        if ( INDEX_Attacker == ME and INDEX_Victim ~= ME ) then
+        
+                local response = tostring(killsays[math.random(#killsays)]);
+                response = response:gsub("name", NAME_Victim);
+                client.ChatSay(gui.GetValue("misc.miscTab.KSEditBox"));
+        else
+         return;
+        end
+        
+        end
+    
+    end
+ end
+
+client.AllowListener( 'player_death' );
+
+callbacks.Register('FireGameEvent', 'AWKS', CHAT_customKillSay);
+--[[CUSTOM KILLSAY END]]--
+
+--[[SNIPER CROSSHAIR START]]--
+callbacks.Register('Draw', function()
+    if sniperXHair:GetValue() then 
+        client.SetConVar( "weapon_debug_spread_show", 3, true )
+    else
+        client.SetConVar( "weapon_debug_spread_show", 0, true )
+    end
+     
+end)
+--[[SNIPER CROSSHAIR END]]--
