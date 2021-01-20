@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "3"
+local VERSION_NUMBER = "3.1"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -129,6 +129,8 @@ local colorPickerText = gui.ColorPicker(colorGroup, "textCol", "Text Colour", 25
 
 function round(num, numDecimalPlaces)
     local mult = 10^(numDecimalPlaces or 0)
+    if not entities.GetLocalPlayer() then return end
+	if not entities.GetLocalPlayer():IsAlive() then return end
     return math.floor(num * mult + 0.5) / mult
 end
 
@@ -152,6 +154,8 @@ callbacks.Register("Draw", function()
     -- do not edit above
  
     local divider = ' | ';
+    local divider2 = '| ';
+    local space = ' ';
     local cheatName = 'nxzUI';
 
     --function customName()
@@ -174,15 +178,20 @@ callbacks.Register("Draw", function()
     
     -- Do not edit below
     local delay;
+    local string;
     local tick;
   
     if (lp ~= nil) then
-        delay = 'delay: ' .. playerResources:GetPropInt("m_iPing", lp:GetIndex()) .. 'ms';
+        delay = 'delay: ' .. playerResources:GetPropInt("m_iPing", lp:GetIndex()) .. 'ms ';
+        string = engine.GetServerIP() == "loopback" and "local server" or (engine.GetServerIP():find("^=%[A") and "valve server" or (engine.GetServerIP() == "(unknown)" and "Demo" or engine.GetServerIP()));
         --tick = math.floor(lp:GetProp("localdata", "m_nTickBase") + 0x3430 * 2) .. 'tick';
     end
-    local watermarkText = cheatName .. divider .. userName .. divider;
+    local watermarkText = cheatName .. divider .. userName .. space;
+    if (string ~= nil) then
+        watermarkText = watermarkText .. divider2 .. string;
+    end
     if (delay ~= nil) then
-        watermarkText = watermarkText .. delay ;
+        watermarkText = watermarkText .. divider .. delay ;
     end
     if (tick ~= nil) then
         --watermarkText = watermarkText .. tick;
@@ -295,7 +304,7 @@ if gui.GetValue("lbot.master") and gui.GetValue("lbot.posadj.backtrack") then
             i = i + 1;
     end
 ---------------------------
-if gui.GetValue("rbot.master") and (wid == 1 or wid == 64) and gui.GetValue("rbot.accuracy.weapon.hpistol.doublefire") then
+if gui.GetValue("rbot.master") and (wid == 1 or wid == 64) and gui.GetValue("rbot.accuracy.weapon.hpistol.doublefire") ~= 0 then
     Keybinds[i] = 'Doubletap';
         i = i + 1;
 elseif gui.GetValue("rbot.master") and (wid == 2 or wid == 3 or wid == 4 or wid == 30 or wid == 32 or wid == 36 or wid == 61 or wid == 63) and gui.GetValue("rbot.accuracy.weapon.pistol.doublefire") ~= 0 then
@@ -538,6 +547,9 @@ end
 if infolist:GetValue() == true then
 
     local weaponInacc = entities.GetLocalPlayer():GetWeaponInaccuracy()
+        if not entities.GetLocalPlayer() then return end
+        if not entities.GetLocalPlayer():IsAlive() then return end
+        
         inaccuracy = round(weaponInacc, 3) * 100;
         inaccuracy2 = 100 - inaccuracy;
 
