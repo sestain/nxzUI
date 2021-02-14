@@ -1,6 +1,6 @@
 --[[
 
-nxzUI v3 by naz.
+nxzUI v3.2 by naz.
 
 nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.
 I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long period of time.
@@ -15,7 +15,7 @@ https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua
 local SCRIPT_FILE_NAME = GetScriptName()
 local SCRIPT_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/nxzUI.lua"
 local VERSION_FILE_ADDR = "https://raw.githubusercontent.com/n4zzu/nxzUI/main/version.txt"
-local VERSION_NUMBER = "3.1"
+local VERSION_NUMBER = "3.2"
 local version_check_done = false
 local update_downloaded = false
 local update_available = false
@@ -116,6 +116,8 @@ local infolist = gui.Checkbox(mainGroup, "infolist", "pLocal Info", false)
 local leftHandKnife = gui.Checkbox(mainGroup, "lefthandknife", "Left Hand Knife", false)
 local sniperXHair = gui.Checkbox(mainGroup, "sniperxhair", "Sniper Crosshair", false)
 local rainbowBar = gui.Checkbox(mainGroup, "rainbowBar", "Rainbow Bar", false)
+local killEffect = gui.Checkbox(mainGroup, "killEffect", "Kill Effect", false)
+local killEffectTime = gui.Slider(mainGroup, "killEffectTime", "Kill Effect Time", 3, 3, 10)
 local ezfrags = gui.Checkbox(miscGroup, "ezfragsKS", "EZ Frags Kill Say", false)
 local customKillSay = gui.Checkbox(miscGroup, "customKS", "Custom Killsay", false)
 local customNameCheckBox = gui.Checkbox(mainGroup, "cNCheckBox", "Custom Watermark Cheat Name", false)
@@ -136,7 +138,7 @@ end
 
 gui.Text(infoMainGroup, "nxzUI v3")
 gui.Text(infoMainGroup, "-------------------------------------------------------------------------------------------------------------------")
-gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Bugs Fixed by Sestain#5799 (UID:219942)")
+gui.Text(infoMainGroup, "Made by naz#6660 (UID: 71838) & Sestain#5799 (UID:219942)")
 gui.Text(infoMainGroup, "nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.")
 gui.Text(infoMainGroup, "I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long     period of time.")
 gui.Text(infoMainGroup, "aimware still hasn't updated the docs which makes it kinda hard to make new features/ideas.")
@@ -762,6 +764,32 @@ client.AllowListener( 'player_death' );
 callbacks.Register('FireGameEvent', 'AWKS', CHAT_customKillSay);
 --[[CUSTOM KILLSAY END]]--
 
+--[[KILL EFFECT START]]--
+function Kill_Effect( Event )
+    if killEffect:GetValue() == true then
+        if ( Event:GetName() == 'player_death' ) then
+            local ME = client.GetLocalPlayerIndex();
+
+            local INT_UID = Event:GetInt( 'userid' );
+            local INT_ATTACKER = Event:GetInt( 'attacker' );
+
+            local INDEX_Victim = client.GetPlayerIndexByUserID( INT_UID );
+            local INDEX_Attacker = client.GetPlayerIndexByUserID( INT_ATTACKER );
+
+            if ( INDEX_Attacker == ME and INDEX_Victim ~= ME ) then
+                entities.GetLocalPlayer():SetPropFloat(globals.CurTime() + (gui.GetValue( "esp.visualTab.killEffectTime" ) * 0.1), "m_flHealthShotBoostExpirationTime");
+            else
+                return;
+            end
+        end
+    end
+end
+
+client.AllowListener( 'player_death' );
+
+callbacks.Register('FireGameEvent', 'AWKS', Kill_Effect);
+--[[KILL EFFECT END]]--
+
 --[[SNIPER CROSSHAIR START]]--
 callbacks.Register('Draw', function()
     if sniperXHair:GetValue() then 
@@ -772,3 +800,7 @@ callbacks.Register('Draw', function()
      
 end)
 --[[SNIPER CROSSHAIR END]]--
+
+callbacks.Register("Draw", function() killEffectTime:SetInvisible(killEffect:GetValue() == false) end)
+callbacks.Register("Draw", function() editbox:SetInvisible(customNameCheckBox:GetValue() == false) end)
+callbacks.Register("Draw", function() editbox2:SetInvisible(customNameCheckBox2:GetValue() == false) end)
