@@ -1,6 +1,8 @@
 --[[
 
+
 nxzUI v3.2 by naz.
+
 
 nxzUI is a user interface lua for aimware.net intended for use with legit and rage cheating.
 I update this lua whenever I can be bothered to work on it, so don't expect super frequent updates over a long period of time.
